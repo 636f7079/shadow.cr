@@ -1,0 +1,37 @@
+language: generic
+services:
+- docker
+matrix:
+  include:
+  - os: linux
+    dist: trusty
+    env:
+    - DEPLOY_FILENAME=Shadow_Linux.tar.gz
+    - DEPLOY_DIR=bin/linux
+    - DEPLOY_STATIC="--static"
+  - os: osx
+    env:
+    - DEPLOY_FILENAME=Shadow_macOS.tar.gz
+    - DEPLOY_DIR=bin/darwin
+    - DEPLOY_STATIC=""
+    - LDFLAGS=-L/usr/local/opt/openssl/lib
+    - CPPFLAGS=-I/usr/local/opt/openssl/include
+    - PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig
+    - PATH=/usr/local/opt/openssl/bin:$PATH
+install:
+- chmod +x bin/ci
+- bin/ci prepare_build
+script:
+- bin/ci build
+after_success:
+- bin/ci deploy
+deploy:
+  provider: releases
+  api_key:
+    secure: 6UDUdh7ctlI2niWVmLvOEPxrj8sIMwnGNuuPBwVodArgX2ezqPaO2+hRaixywfUfwmGUsx0PEfcYnBbCUomSdOOdx5sVZZ1zGkqy9VQaLgD/lpG2Ca6GuduJzn/6gX5wxCN/X5a6F8AGYEpCq3ay9rFEk8AO5rX8CcPkV7rCGfWbchPTd0qAocwk+NAd7B/yBmnWQzplkWBN8WzhMpawHF5uF57xcG97Empgz6nTWIxm6khtBGkoucy2hGdLYAa7aV8EDFsfcOVdiuuO1he9nEPevYhEX6CkfN8H0h8wvP73O3Gs5n3fPbUulXgy73TMXXFQznPNPsDN+GS6PbBMHCOIpJKBPC7GVRpUfREyUVpl2aKbATJSWiwqY1qeCUs/jVtce6F80h4Q4YxddSL4Q5zIg/BDbATGeO0gdbJ9wdpcskdu4i9QT/Lukiok7dbbkF2l6Y7eY0tempG/ng1anEpRJ5Ckl48Lldn71+A+hqUa93MRiD+kfP6d2eD2yF61J56IfcE8oxeteHa9Tg+TooUNpsnJJzGZws0SJO1eseOlk015T5mbb5QbFVRJqtl7G1Hd/w6+JtHQjAd9dkhfY+mHpuymKO2zR8Q+vX1hvLxI73795ZT1sNhv0qXa6aNAelKRJ/4l9D/Q9ZmjHnS8cYt31t2t7yv1gAEtd0vI5EA=
+  file: "$DEPLOY_FILENAME"
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
+    repo: 636f7374/shadow.cr
