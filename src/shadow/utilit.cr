@@ -34,8 +34,9 @@ module Shadow::Utilit
   def ask_rename(dir, ask : Symbol)
     loop do
       print reply[:rename][ask]
-      input = Utilit.input
-      input += "/" unless '/' == input[-1]
+      i = Utilit.input
+      i += "/" unless '/' == i[-1]
+      input = i.gsub /\\ /, " "
       break yield File.dirname(dir) + input
     end
   end
@@ -43,8 +44,10 @@ module Shadow::Utilit
   def ask_move(dir, ask : Symbol)
     loop do
       print reply[:move][ask]
-      if File.directory? input = Utilit.input
-        input += "/" unless '/' == input[-1]
+      i = Utilit.input
+      i += "/" unless '/' == i[-1]
+      input = i.gsub /\\ /, " "
+      if File.directory? input
         break yield input + File.basename(dir)
       end
       puts reply[:invalid][:path]
