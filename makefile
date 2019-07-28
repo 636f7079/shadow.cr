@@ -11,4 +11,4 @@ test: shard
 shard:
 	shards build
 clean:
-	rm -f $(SHADOW_OUT)* && rm -rf lib
+	rm -f $(SHADOW_OUT)* && rm -rf lib && rm -f shard.lock
