@@ -68,16 +68,16 @@ class Shadow::Record
 
   def set_column_with_value(record : Parser::Record)
     Render.enter "Column"
-    record.set_column Utilit.input
+    record.set_column Utils.input
     Render.enter "_Value"
-    record.set_value Utilit.input
+    record.set_value Utils.input
     yield
   end
 
   def set_column_with_rowid(record : Parser::Record)
     set_rowid record do
       Render.enter "Column"
-      record.set_column Utilit.input
+      record.set_column Utils.input
       yield
     end
   end
@@ -85,7 +85,7 @@ class Shadow::Record
   def set_rowid(record : Parser::Record)
     loop do
       Render.enter "_RowId"
-      i = Utilit.input
+      i = Utils.input
       if i.to_i?
         record.set_rowid i.to_i
         break yield
@@ -97,7 +97,7 @@ class Shadow::Record
   def extract_shield(vault : Parser::Vault)
     Render.ask_master_key do |master_key|
       builder = Shield::Builder.new Shield::Option.from_json vault.to_json
-      vault.secureId = Shield::Utilit.create_id vault.title
+      vault.secureId = Shield::Utils.create_id vault.title
       builder.create_key(master_key, vault.secureId) do |done?, data|
         vault.secretKey = data if done?
         builder.create_pin! data do |pin|
@@ -174,7 +174,7 @@ class Shadow::Record
             return Render.error message unless success?
             data = "Nil" if data.empty?
             print String.build { |io| io << option.record.column << ":[" << data << "]: " }
-            option.record.set_value Utilit.input
+            option.record.set_value Utils.input
             database.update_column_by_rowid(option.table.name, option.record) do |success?, message|
               return Render.error message unless success?
               Render.update data, option.record.value

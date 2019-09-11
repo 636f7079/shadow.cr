@@ -1,8 +1,5 @@
 module Shadow::Render
-  include Shield::Render
-  extend self
-
-  def move(from, to : String)
+  def self.move(from, to : String)
     puts String.build { |io|
       io << "Moved "
       io << from.colorize.yellow
@@ -11,7 +8,7 @@ module Shadow::Render
     }
   end
 
-  def update(from, to : String)
+  def self.update(from, to : String)
     puts String.build { |io|
       io << "Updated "
       io << from.colorize.yellow
@@ -20,7 +17,7 @@ module Shadow::Render
     }
   end
 
-  def rename(from, to : String)
+  def self.rename(from, to : String)
     puts String.build { |io|
       io << "Renamed "
       io << from.colorize.yellow
@@ -29,7 +26,7 @@ module Shadow::Render
     }
   end
 
-  def bind(from, to : String)
+  def self.bind(from, to : String)
     puts String.build { |io|
       io << "Bind "
       io << from.colorize.yellow
@@ -38,55 +35,79 @@ module Shadow::Render
     }
   end
 
-  def create(text : String)
+  def self.create(text : String)
     puts String.build { |io|
       io << "Created ".colorize.green
       io << text
     }
   end
 
-  def destroy(text : String)
+  def self.destroy(text : String)
     puts String.build { |io|
       io << "Destroy ".colorize.red
       io << text
     }
   end
 
-  def delete(text : String)
+  def self.delete(text : String)
     puts String.build { |io|
       io << "Deleted ".colorize.red
       io << text
     }
   end
 
-  def reset(text : String)
+  def self.reset(text : String)
     puts String.build { |io|
       io << "Reset ".colorize.yellow
       io << text
     }
   end
 
-  def error(text : String | Nil)
+  def self.error(text : String | Nil)
     puts String.build { |io|
       io << "Error ".colorize.red
       text.try { |value| io << value }
     }
   end
 
-  def select(text : String)
+  def self.enter(name : String)
+    print String.build { |io|
+      io << "Enter "
+      io << name << ": "
+    }
+  end
+
+  def self.ask_master_key
+    enter "MasterKey"
+    yield Secrets.gets
+  end
+
+  def self.final(name, vaule : String)
+    puts item name, vaule
+  end
+
+  def self.item(name, vaule : String)
+    String.build do |io|
+      io << "\r" << name
+      io << ": ["
+      io << vaule << "]"
+    end
+  end
+
+  def self.select(text : String)
     puts String.build { |io|
       io << "Selected ".colorize.green
       io << text
     }
   end
 
-  def enter_invalid
+  def self.enter_invalid
     puts String.build { |io|
       io << "Enter Invalid, Please try again.".colorize.red
     }
   end
 
-  def show_record(vault : Parser::Vault)
+  def self.show_record(vault : Parser::Vault)
     Render.final "Secure_Id", vault.secureId
     Render.final "TitleName", vault.title
     Render.final "_Location", vault.location
@@ -97,7 +118,7 @@ module Shadow::Render
     Render.final "Key_Valid", vault.key_valid.to_s
   end
 
-  def record_headings
+  def self.record_headings
     [["RowId", "Title", "Location",
       "UserName", "Email", "PinCode"],
     ["RowId", "Title", "Location",
@@ -105,7 +126,7 @@ module Shadow::Render
      "Symbol", "Length", "Iterations"]]
   end
 
-  def row_record(vault : Parser::Vault)
+  def self.row_record(vault : Parser::Vault)
     [[vault.rowId, vault.title,
       vault.location, vault.userName,
       vault.email, vault.pinCode],
@@ -116,7 +137,7 @@ module Shadow::Render
      vault.iterations]]
   end
 
-  def show_all_records(vault, type : Record::Action)
+  def self.show_all_records(vault, type : Record::Action)
     case type
     when Record::Action::Summary
       terminal_table = TerminalTable.new
@@ -133,7 +154,7 @@ module Shadow::Render
     end
   end
 
-  def tables_summary(list : Array(Tuple(String, Int32)))
+  def self.tables_summary(list : Array(Tuple(String, Int32)))
     terminal_table = TerminalTable.new
     terminal_table.headings = ["TableName", "RowCount"]
     list.each { |n| terminal_table << [n.first, n.last] }

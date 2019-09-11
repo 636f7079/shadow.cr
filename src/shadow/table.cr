@@ -62,7 +62,7 @@ class Shadow::Table
 
   def input_table_name_not_exist(table_names : Array(String), tips : String)
     loop do
-      print Render.enter tips; input = Utilit.input
+      print Render.enter tips; input = Utils.input
       break yield input unless table_names.includes? input
       puts "The Input TableName Already exists, Please try again."
     end
@@ -70,7 +70,7 @@ class Shadow::Table
 
   def input_table_name_exist(table_names : Array(String), tips : String)
     loop do
-      print Render.enter tips; input = Utilit.input
+      print Render.enter tips; input = Utils.input
       break yield input if table_names.includes? input
       puts "The Input TableName Does not Exist, Please try again."
     end

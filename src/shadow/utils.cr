@@ -1,7 +1,5 @@
-module Shadow::Utilit
-  extend self
-
-  def reply : NamedTuple
+module Shadow::Utils
+  def self.reply : NamedTuple
     {
       exist: {
         config: "Can't find the configuration file, initialize? (Y/n) ",
@@ -27,24 +25,24 @@ module Shadow::Utilit
     }
   end
 
-  def input : String
+  def self.input : String
     STDIN.gets.to_s.chomp.rstrip
   end
 
-  def ask_rename(dir, ask : Symbol)
+  def self.ask_rename(dir, ask : Symbol)
     loop do
       print reply[:rename][ask]
-      i = Utilit.input
+      i = input
       i += "/" unless '/' == i[-1]
       input = i.gsub /\\ /, " "
       break yield File.dirname(dir) + input
     end
   end
 
-  def ask_move(dir, ask : Symbol)
+  def self.ask_move(dir, ask : Symbol)
     loop do
       print reply[:move][ask]
-      i = Utilit.input
+      i = input
       i += "/" unless '/' == i[-1]
       input = i.gsub /\\ /, " "
       if File.directory? input
@@ -54,10 +52,10 @@ module Shadow::Utilit
     end
   end
 
-  def ask_bind(ask : Symbol)
+  def self.ask_bind(ask : Symbol)
     loop do
       print reply[:bind][ask]
-      input = Utilit.input
+      input = self.input
       if File.file? input
         break yield input
       end
@@ -65,24 +63,24 @@ module Shadow::Utilit
     end
   end
 
-  def exist?(path, ask : Symbol)
+  def self.exist?(path, ask : Symbol)
     loop do
       break yield true if File.file? path
       print reply[:exist][ask]
-      case Utilit.input
+      case input
       when "Y", "y" then break yield false
       when "N", "n" then abort nil
       end
     end
   end
 
-  def conflict?(path : String, ask : Symbol)
+  def self.conflict?(path : String, ask : Symbol)
     loop do
       unless File.file? path
         break yield false
       end
       print reply[:conflict][ask]
-      case Utilit.input
+      case input
       when "Y", "y"
         self.delete path do
           break yield true
@@ -94,7 +92,7 @@ module Shadow::Utilit
     end
   end
 
-  def rename(before, after : String)
+  def self.rename(before, after : String)
     begin
       yield if File.rename before, after
     rescue ex : Errno
@@ -102,7 +100,7 @@ module Shadow::Utilit
     end
   end
 
-  def move(before, after : String)
+  def self.move(before, after : String)
     begin
       yield if FileUtils.mv before, after
     rescue ex : Errno
@@ -110,7 +108,7 @@ module Shadow::Utilit
     end
   end
 
-  def create(path : String)
+  def self.create(path : String)
     begin
       yield if FileUtils.touch path
     rescue ex : Exception
@@ -118,7 +116,7 @@ module Shadow::Utilit
     end
   end
 
-  def read(path : String)
+  def self.read(path : String)
     begin
       yield File.read path
     rescue ex : Errno
@@ -126,7 +124,7 @@ module Shadow::Utilit
     end
   end
 
-  def delete(path : String)
+  def self.delete(path : String)
     begin
       yield if File.delete path
     rescue ex : Errno
@@ -134,7 +132,7 @@ module Shadow::Utilit
     end
   end
 
-  def mkdir_p(path : String)
+  def self.mkdir_p(path : String)
     begin
       yield if Dir.mkdir_p File.dirname(path)
     rescue ex : Errno
@@ -142,7 +140,7 @@ module Shadow::Utilit
     end
   end
 
-  def write(path, text : String)
+  def self.write(path, text : String)
     begin
       yield if File.write path, text, mode: "wb"
     rescue ex : Errno

@@ -6,7 +6,7 @@ module Shadow::Setup
   {% for item in ["integer", "boolean", "string"] %}
   def {{item.id}}(desc, option : NamedTuple)
     loop do
-      Render.enter desc ensure input = Utilit.input
+      Render.enter desc ensure input = Utils.input
       case [input.empty?, option[:allow_empty]]
       when [true, false]
         puts "Input can not be empty, Please try again.".colorize.red
@@ -51,7 +51,7 @@ module Shadow::Setup
       return vault.signature = String.new if false == data.as Bool
       Render.ask_master_key do |master_key|
         builder = Shield::Builder.new Shield::Option.from_json vault.to_json
-        secure_id = Shield::Utilit.create_id vault.title
+        secure_id = Shield::Utils.create_id vault.title
         builder.create_key(master_key, secure_id) do |done?, data|
           if done?
             builder.create_pin! data do |pin|
