@@ -1,5 +1,4 @@
 class Shadow::Table
-  alias Message = String | Nil
   property database : SQLite
   property option : Option
 
@@ -43,34 +42,25 @@ class Shadow::Table
     end
   end
 
-  def summary_handler
-    fetch_table_names_with_counts do |names, counts|
-      Render.tables_summary names.zip(counts)
-    end
+  def show_table_summary(names, counts : Array(Int32))
+    Render.tables_summary names.zip(counts) if option.table.name.empty?
   end
 
-  def select_handler
-    fetch_table_names_with_counts do |names, counts|
-      Render.tables_summary names.zip(counts)
-      input_table_name_exist(names, "TableName") do |table_name|
-        option.table.set_name table_name
-        Render.select table_name
-        Record.launch option, database
-      end
-    end
-  end
+  def input_table_name_not_exist(table_names : Array(String), ask : String)
+    return yield option.table.name unless table_names.includes? option.table.name
 
-  def input_table_name_not_exist(table_names : Array(String), tips : String)
     loop do
-      print Render.enter tips; input = Utils.input
+      print Render.enter ask ensure input = Utils.input
       break yield input unless table_names.includes? input
       puts "The Input TableName Already exists, Please try again."
     end
   end
 
-  def input_table_name_exist(table_names : Array(String), tips : String)
+  def input_table_name_exist(table_names : Array(String), ask : String)
+    return yield option.table.name if table_names.includes? option.table.name
+
     loop do
-      print Render.enter tips; input = Utils.input
+      print Render.enter ask ensure input = Utils.input
       break yield input if table_names.includes? input
       puts "The Input TableName Does not Exist, Please try again."
     end
@@ -86,9 +76,26 @@ class Shadow::Table
     end
   end
 
-  def create_handler
+  def summary_handler
     fetch_table_names_with_counts do |names, counts|
       Render.tables_summary names.zip(counts)
+    end
+  end
+
+  def select_handler
+    fetch_table_names_with_counts do |names, counts|
+      show_table_summary names, counts
+      input_table_name_exist(names, "TableName") do |table_name|
+        option.table.set_name table_name
+        Render.select table_name
+        Record.launch option, database
+      end
+    end
+  end
+
+  def create_handler
+    fetch_table_names_with_counts do |names, counts|
+      show_table_summary names, counts
       input_table_name_not_exist(names, "TableName") do |table_name|
         database.create_table table_name do |success?, message|
           return Render.error message unless success?
@@ -100,7 +107,7 @@ class Shadow::Table
 
   def delete_handler
     fetch_table_names_with_counts do |names, counts|
-      Render.tables_summary names.zip(counts)
+      show_table_summary names, counts
       input_table_name_exist(names, "TableName") do |table_name|
         database.drop_table table_name do |success?, message|
           return Render.error message unless success?
@@ -112,7 +119,7 @@ class Shadow::Table
 
   def rename_handler
     fetch_table_names_with_counts do |names, counts|
-      Render.tables_summary names.zip(counts)
+      show_table_summary names, counts
       input_table_name_exist(names, "BeforeName") do |before_name|
         input_table_name_not_exist(names, "_AfterName") do |after_name|
           database.rename_table(before_name, after_name) do |success?, message|

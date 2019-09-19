@@ -18,7 +18,7 @@ module Shadow::CommandParser
     puts <<-EOF
     Version:
       Shadow.cr :: CLI Password Vault
-      _Version_ :: #{VERSION} (2019.09.11)
+      _Version_ :: #{VERSION} (2019.09.19)
     EOF
   when "help", "-h"
     puts <<-EOF
@@ -32,10 +32,14 @@ module Shadow::CommandParser
       move                             Move The Shadow.cr Database File Location
       destroy                          Destroy The Shadow.cr Configuration file
       --summary-table, -i              View all Vault Tables (i.e. Name, RowCount)
-      --create-table, -c               Create a Vault Table by Enter Table Name
-      --delete-table, -d               Delete a Vault Table by Enter Table Name
-      --select-table, -s               Select a Vault Table by Enter Table Name
-      --rename-table, -r               Rename the Vault Table by Enter Table Name
+      -c [tableName]                   Create a Vault Table by ARGV Table Name
+      -d [tableName]                   Delete a Vault Table by ARGV Table Name
+      -s [tableName]                   Select a Vault Table by ARGV Table Name
+      -r [tableName]                   Rename the Vault Table by ARGV Table Name
+      --create-table                   Create a Vault Table by Enter Table Name
+      --delete-table                   Delete a Vault Table by Enter Table Name
+      --select-table                   Select a Vault Table by Enter Table Name
+      --rename-table                   Rename the Vault Table by Enter Table Name
     Options:
       --resign                         Resign the MasterKey by PKCS5 Pbkdf2HMAC
       --delete                         Delete Record by Column Name and Value

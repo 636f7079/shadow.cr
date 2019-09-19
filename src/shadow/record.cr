@@ -1,5 +1,4 @@
 class Shadow::Record
-  alias Message = String | Nil
   property database : SQLite
   property option : Option
 

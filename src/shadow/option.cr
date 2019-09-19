@@ -14,16 +14,32 @@ class Shadow::Option
       parser.on("-i", "--summary-table", "") do
         table.action = Table::Action::Summary
       end
-      parser.on("-c", "--create-table", "") do
+      parser.on("-c +", "") do |item|
+        table.action = Table::Action::Create
+        table.name = item
+      end
+      parser.on("-d +", "") do |item|
+        table.action = Table::Action::Delete
+        table.name = item
+      end
+      parser.on("-s +", "") do |item|
+        table.action = Table::Action::Select
+        table.name = item
+      end
+      parser.on("-r +", "") do |item|
+        table.action = Table::Action::Rename
+        table.name = item
+      end
+      parser.on("--create-table", "") do
         table.action = Table::Action::Create
       end
-      parser.on("-d", "--delete-table", "") do
+      parser.on("--delete-table", "") do
         table.action = Table::Action::Delete
       end
-      parser.on("-s", "--select-table", "") do
+      parser.on("--select-table", "") do
         table.action = Table::Action::Select
       end
-      parser.on("-r", "--rename-table", "") do
+      parser.on("--rename-table", "") do
         table.action = Table::Action::Rename
       end
       parser.on("--decrypt", "") do
