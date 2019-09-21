@@ -6,11 +6,11 @@ module Shadow::Config
   end
 
   def init_config
-    Utils.conflict?(default_path, :conflict) do |conflict?|
+    Utils.conflict? default_path, :conflict do |conflict?|
       Render.delete default_path if conflict?
       config = Parser::Config.new
       Shadow::Parser::Config.default config
-      Utils.write(default_path, config.to_yaml) do
+      Utils.write default_path, config.to_yaml do
         Render.create default_path
         yield
       end
@@ -28,7 +28,7 @@ module Shadow::Config
   end
 
   def path_exist?
-    Utils.exist?(default_path, :config) do |exist?|
+    Utils.exist? default_path, :config do |exist?|
       yield exist?
     end
   end
@@ -58,11 +58,11 @@ module Shadow::Config
 
   def move_database
     load_config do |config|
-      Utils.ask_move(config.database, :database) do |after|
-        Utils.move(config.database, after) do
+      Utils.ask_move config.database, :database do |after|
+        Utils.move config.database, after do
           before = config.database
           config.database = after
-          Utils.write(default_path, config.to_yaml) do
+          Utils.write default_path, config.to_yaml do
             Render.move before, after
           end
         end
@@ -72,11 +72,11 @@ module Shadow::Config
 
   def rename_database
     load_config do |config|
-      Utils.ask_rename(config.database, :database) do |after|
-        Utils.rename(config.database, after) do
+      Utils.ask_rename config.database, :database do |after|
+        Utils.rename config.database, after do
           before = config.database
           config.database = after
-          Utils.write(default_path, config.to_yaml) do
+          Utils.write default_path, config.to_yaml do
             Render.rename before, after
           end
         end
@@ -89,7 +89,7 @@ module Shadow::Config
       Utils.ask_bind :database do |after|
         before = config.database
         config.database = after
-        Utils.write(default_path, config.to_yaml) do
+        Utils.write default_path, config.to_yaml do
           Render.bind before, after
         end
       end
@@ -98,11 +98,11 @@ module Shadow::Config
 
   def reset_database
     load_config do |config|
-      Utils.conflict?(config.database, :database) do |conflict?|
+      Utils.conflict? config.database, :database do |conflict?|
         Render.delete config.database if conflict?
         default = Parser::Config.new
         Shadow::Parser::Config.default default
-        Utils.write(config.database, String.new) do
+        Utils.write config.database, String.new do
           Render.reset config.database
         end
       end
@@ -120,13 +120,16 @@ module Shadow::Config
 
   def init_database
     load_config do |config|
-      Utils.conflict?(config.database, :database) do |conflict?|
+      Utils.conflict? config.database, :database do |conflict?|
         Render.delete config.database if conflict?
         default = Parser::Config.new
         Shadow::Parser::Config.default default
         Utils.mkdir_p default.database do
           Utils.create default.database do
-            Render.create default.database
+            config.database = default.database
+            Utils.write default_path, config.to_yaml do
+              Render.create default.database
+            end
           end
         end
       end

@@ -29,7 +29,7 @@ module Shadow::Utils
     STDIN.gets.to_s.chomp.rstrip
   end
 
-  def self.ask_rename(dir, ask : Symbol)
+  def self.ask_rename(dir, ask : Symbol, &block)
     loop do
       print reply[:rename][ask]
       i = input
@@ -39,7 +39,7 @@ module Shadow::Utils
     end
   end
 
-  def self.ask_move(dir, ask : Symbol)
+  def self.ask_move(dir, ask : Symbol, &block)
     loop do
       print reply[:move][ask]
       i = input
@@ -52,7 +52,7 @@ module Shadow::Utils
     end
   end
 
-  def self.ask_bind(ask : Symbol)
+  def self.ask_bind(ask : Symbol, &block)
     loop do
       print reply[:bind][ask]
       input = self.input
@@ -63,7 +63,7 @@ module Shadow::Utils
     end
   end
 
-  def self.exist?(path, ask : Symbol)
+  def self.exist?(path, ask : Symbol, &block)
     loop do
       break yield true if File.file? path
       print reply[:exist][ask]
@@ -74,7 +74,7 @@ module Shadow::Utils
     end
   end
 
-  def self.conflict?(path : String, ask : Symbol)
+  def self.conflict?(path : String, ask : Symbol, &block)
     loop do
       unless File.file? path
         break yield false
@@ -82,9 +82,12 @@ module Shadow::Utils
       print reply[:conflict][ask]
       case input
       when "Y", "y"
+        _break = false
         self.delete path do
-          break yield true
+          _break = true
         end
+
+        break yield true if _break
       when "N", "n" then break
       else
         puts reply[:invalid][:input]
@@ -92,31 +95,34 @@ module Shadow::Utils
     end
   end
 
-  def self.rename(before, after : String)
+  def self.rename(before, after : String, &block)
     begin
-      yield if File.rename before, after
+      File.rename before, after
+      yield
     rescue ex : Errno
       raise RenameFailed.new ex.message
     end
   end
 
-  def self.move(before, after : String)
+  def self.move(before, after : String, &block)
     begin
-      yield if FileUtils.mv before, after
+      FileUtils.mv before, after
+      yield
     rescue ex : Errno
       raise MoveFailed.new ex.message
     end
   end
 
-  def self.create(path : String)
+  def self.create(path : String, &block)
     begin
-      yield if FileUtils.touch path
+      FileUtils.touch path
+      yield
     rescue ex : Exception
       raise CreateFailed.new ex.message
     end
   end
 
-  def self.read(path : String)
+  def self.read(path : String, &block)
     begin
       yield File.read path
     rescue ex : Errno
@@ -124,25 +130,28 @@ module Shadow::Utils
     end
   end
 
-  def self.delete(path : String)
+  def self.delete(path : String, &block)
     begin
-      yield if File.delete path
+      File.delete path
+      yield
     rescue ex : Errno
       raise DeleteFailed.new ex.message
     end
   end
 
-  def self.mkdir_p(path : String)
+  def self.mkdir_p(path : String, &block)
     begin
-      yield if Dir.mkdir_p File.dirname(path)
+      Dir.mkdir_p File.dirname(path)
+      yield
     rescue ex : Errno
       raise CreateFailed.new ex.message
     end
   end
 
-  def self.write(path, text : String)
+  def self.write(path, text : String, &block)
     begin
-      yield if File.write path, text, mode: "wb"
+      File.write path, text, mode: "wb"
+      yield
     rescue ex : Errno
       raise WriteFailed.new ex.message
     end
