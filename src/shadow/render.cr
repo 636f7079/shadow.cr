@@ -2,10 +2,10 @@ module Shadow::Render
   def self.reply : NamedTuple
     {
       exist: {
-        config: "Can't find the configuration file, initialize? (Y/n) ",
+        config: "Can't Find the Config File, initialize? (Y/n) ",
       },
       conflict: {
-        config:   "The Configuration File already exists, delete? (Y/n) ",
+        config:   "The Config File already exists, delete? (Y/n) ",
         database: "The Database File already exists, delete? (Y/n) ",
       },
       move: {
