@@ -1,4 +1,30 @@
 module Shadow::Render
+  def self.reply : NamedTuple
+    {
+      exist: {
+        config: "Can't find the configuration file, initialize? (Y/n) ",
+      },
+      conflict: {
+        config:   "The Configuration File already exists, delete? (Y/n) ",
+        database: "The Database File already exists, delete? (Y/n) ",
+      },
+      move: {
+        database: "Move the DataBase File to Directory: ",
+      },
+      bind: {
+        database: "Bind the DataBase File to File: ",
+      },
+      rename: {
+        database: "Rename the DataBase File to FileName: ",
+      },
+      invalid: {
+        path:  "Invalid Path, Please try again.",
+        file:  "Invalid File, Please try again.",
+        input: "Invalid Input, Please try again.",
+      },
+    }
+  end
+
   def self.move(from, to : String)
     puts String.build { |io|
       io << "Moved "

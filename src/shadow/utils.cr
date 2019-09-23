@@ -1,73 +1,56 @@
 module Shadow::Utils
-  def self.reply : NamedTuple
-    {
-      exist: {
-        config: "Can't find the configuration file, initialize? (Y/n) ",
-      },
-      conflict: {
-        config:   "The Configuration File already exists, delete? (Y/n) ",
-        database: "The Database File already exists, delete? (Y/n) ",
-      },
-      move: {
-        database: "Move the DataBase File to: ",
-      },
-      bind: {
-        database: "Bind the DataBase File to: ",
-      },
-      rename: {
-        database: "Rename the DataBase File to: ",
-      },
-      invalid: {
-        path:  "Invalid Path, Please try again.",
-        file:  "Invalid File, Please try again.",
-        input: "Invalid Input, Please try again.",
-      },
-    }
-  end
-
   def self.input : String
     STDIN.gets.to_s.chomp.rstrip
   end
 
-  def self.ask_rename(dir, ask : Symbol, &block)
+  def self.ask_rename(path, ask : Symbol, &block)
     loop do
-      print reply[:rename][ask]
-      i = input
-      i += "/" unless '/' == i[-1]
-      input = i.gsub /\\ /, " "
-      break yield File.dirname(dir) + input
+      print Render.reply[:rename][ask]
+      input = self.input
+
+      break yield String.build do |io|
+        io << File.dirname path
+        io << "/"
+        io << File.basename input
+      end
     end
   end
 
-  def self.ask_move(dir, ask : Symbol, &block)
+  def self.ask_move(path, ask : Symbol, &block)
     loop do
-      print reply[:move][ask]
-      i = input
-      i += "/" unless '/' == i[-1]
-      input = i.gsub /\\ /, " "
+      print Render.reply[:move][ask]
+      input = self.input
+      input = input.gsub /\\ /, " "
+      input += "/" unless '/' == input[-1]
+
       if File.directory? input
-        break yield input + File.basename(dir)
+        break yield String.build do |io|
+          io << input << File.basename path
+        end
       end
-      puts reply[:invalid][:path]
+
+      puts Render.reply[:invalid][:path]
     end
   end
 
   def self.ask_bind(ask : Symbol, &block)
     loop do
-      print reply[:bind][ask]
+      print Render.reply[:bind][ask]
       input = self.input
+
       if File.file? input
         break yield input
       end
-      puts reply[:invalid][:file]
+
+      puts Render.reply[:invalid][:file]
     end
   end
 
   def self.exist?(path, ask : Symbol, &block)
     loop do
       break yield true if File.file? path
-      print reply[:exist][ask]
-      case input
+      print Render.reply[:exist][ask]
+      case self.input
       when "Y", "y" then break yield false
       when "N", "n" then abort nil
       end
@@ -79,8 +62,8 @@ module Shadow::Utils
       unless File.file? path
         break yield false
       end
-      print reply[:conflict][ask]
-      case input
+      print Render.reply[:conflict][ask]
+      case self.input
       when "Y", "y"
         _break = false
         self.delete path do
@@ -90,7 +73,7 @@ module Shadow::Utils
         break yield true if _break
       when "N", "n" then break
       else
-        puts reply[:invalid][:input]
+        puts Render.reply[:invalid][:input]
       end
     end
   end
@@ -139,9 +122,10 @@ module Shadow::Utils
     end
   end
 
-  def self.mkdir_p(path : String, &block)
+  def self.mkdir_p(path : String, full_path? : Bool = true, &block)
     begin
-      Dir.mkdir_p File.dirname(path)
+      path = File.dirname path if full_path?
+      Dir.mkdir_p path
       yield
     rescue ex : Errno
       raise CreateFailed.new ex.message
