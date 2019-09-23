@@ -1,12 +1,10 @@
 module Shadow::Setup
-  extend self
-
   alias Type = String | Int32 | Bool
 
   {% for item in ["integer", "boolean", "string"] %}
-  def {{item.id}}(desc, option : NamedTuple)
+  def self.{{item.id}}(desc, option : NamedTuple)
     loop do
-      Render.enter desc ensure input = Utils.input
+      Render.enter desc ensure input = Config::Utils.input
       case [input.empty?, option[:allow_empty]]
       when [true, false]
         puts "Input can not be empty, Please try again.".colorize.red
@@ -31,21 +29,21 @@ module Shadow::Setup
   end
   {% end %}
 
-  def title_name(vault : Parser::Vault)
+  def self.title_name(vault : Parser::Vault)
     string("TitleName(e.g. dropbox | Must be entered)",
       {allow_empty: false, default: ""}) do |data|
       vault.title = data.as String
     end
   end
 
-  def location(vault : Parser::Vault)
+  def self.location(vault : Parser::Vault)
     string("Location(e.g. dropbox.com | default: nil)",
       {allow_empty: true, default: ""}) do |data|
       vault.location = data.as String
     end
   end
 
-  def signature(vault : Parser::Vault)
+  def self.signature(vault : Parser::Vault)
     boolean("Signature(e.g. false | default: true)",
       {allow_empty: true, default: true}) do |data|
       return vault.signature = String.new if false == data.as Bool
@@ -65,7 +63,7 @@ module Shadow::Setup
     end
   end
 
-  def user_name(vault : Parser::Vault)
+  def self.user_name(vault : Parser::Vault)
     string("UserName(e.g. user | secret)",
       {allow_empty: true, default: ""}) do |data|
       if "secret" == data
@@ -88,7 +86,7 @@ module Shadow::Setup
     end
   end
 
-  def email(vault : Parser::Vault)
+  def self.email(vault : Parser::Vault)
     string("EmailAddress(e.g. user@example.com | secret)",
       {allow_empty: true, default: ""}) do |data|
       if "secret" == data
@@ -114,7 +112,7 @@ module Shadow::Setup
     end
   end
 
-  def pin_code(vault : Parser::Vault)
+  def self.pin_code(vault : Parser::Vault)
     string("PinCode(e.g. 123456 | secret)",
       {allow_empty: true, default: ""}) do |data|
       if "secret" == data
@@ -125,14 +123,14 @@ module Shadow::Setup
     end
   end
 
-  def use_symbol(vault : Parser::Vault)
+  def self.use_symbol(vault : Parser::Vault)
     boolean("UseSymbol(e.g. false | default: true)",
       {allow_empty: true, default: true}) do |data|
       vault.useSymbol = data.as Bool
     end
   end
 
-  def iterations(vault : Parser::Vault)
+  def self.iterations(vault : Parser::Vault)
     integer("Iterations(e.g. 262144 | default: 131072)",
       {allow_empty: true, default: 131072,
        min: 0, max: Int32::MAX}) do |data|
@@ -140,7 +138,7 @@ module Shadow::Setup
     end
   end
 
-  def length(vault : Parser::Vault)
+  def self.length(vault : Parser::Vault)
     integer("Length(e.g. 15 | default: 20)",
       {allow_empty: true, default: 20,
        min: 10, max: 99}) do |data|

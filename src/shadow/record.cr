@@ -67,16 +67,16 @@ class Shadow::Record
 
   def set_column_with_value(record : Parser::Record)
     Render.enter "Column"
-    record.set_column Utils.input
+    record.set_column Config::Utils.input
     Render.enter "_Value"
-    record.set_value Utils.input
+    record.set_value Config::Utils.input
     yield
   end
 
   def set_column_with_rowid(record : Parser::Record)
     set_rowid record do
       Render.enter "Column"
-      record.set_column Utils.input
+      record.set_column Config::Utils.input
       yield
     end
   end
@@ -84,7 +84,7 @@ class Shadow::Record
   def set_rowid(record : Parser::Record)
     loop do
       Render.enter "_RowId"
-      i = Utils.input
+      i = Config::Utils.input
       if i.to_i?
         record.set_rowid i.to_i
         break yield
@@ -173,7 +173,7 @@ class Shadow::Record
             return Render.error message unless success?
             data = "Nil" if data.empty?
             print String.build { |io| io << option.record.column << ":[" << data << "]: " }
-            option.record.set_value Utils.input
+            option.record.set_value Config::Utils.input
             database.update_column_by_rowid(option.table.name, option.record) do |success?, message|
               return Render.error message unless success?
               Render.update data, option.record.value

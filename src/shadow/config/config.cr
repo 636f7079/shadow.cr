@@ -1,11 +1,11 @@
 module Shadow::Config
-  extend self
-
-  def default_path
-    ENV["HOME"] + "/.shadow.yml"
+  def self.default_path
+    String.build do |io|
+      io << ENV["HOME"] << "/.shadow.yml"
+    end
   end
 
-  def init_config
+  def self.init_config
     Utils.conflict? default_path, :conflict do |conflict?|
       Render.delete default_path if conflict?
       config = Parser::Config.new
@@ -17,7 +17,7 @@ module Shadow::Config
     end
   end
 
-  def parse_config(path = default_path)
+  def self.parse_config(path = default_path)
     begin
       Utils.read path do |text|
         yield Parser::Config.from_yaml text
@@ -27,28 +27,33 @@ module Shadow::Config
     end
   end
 
-  def path_exist?
+  def self.default_path_exist?
     Utils.exist? default_path, :config do |exist?|
       yield exist?
     end
   end
 
-  def load_config
-    path_exist? do |exist?|
-      parse_config do |config|
-        return yield config
-      end if exist?
+  def self.load_config
+    default_path_exist? do |exist?|
+      if exist?
+        parse_config do |config|
+          return yield config
+        end
+      end
+
       init_config do
-        path_exist? do |exist?|
-          parse_config do |config|
-            yield config
-          end if exist?
+        default_path_exist? do |exist?|
+          if exist?
+            parse_config do |config|
+              yield config
+            end
+          end
         end
       end
     end
   end
 
-  def destroy
+  def self.destroy
     destroy_database do
       Utils.delete default_path do
         Render.destroy default_path
@@ -56,7 +61,7 @@ module Shadow::Config
     end
   end
 
-  def move_database
+  def self.move_database
     load_config do |config|
       Utils.ask_move config.database, :database do |after|
         Utils.move config.database, after do
@@ -70,7 +75,7 @@ module Shadow::Config
     end
   end
 
-  def rename_database
+  def self.rename_database
     load_config do |config|
       Utils.ask_rename config.database, :database do |after|
         Utils.rename config.database, after do
@@ -84,7 +89,7 @@ module Shadow::Config
     end
   end
 
-  def bind_database
+  def self.bind_database
     load_config do |config|
       Utils.ask_bind :database do |after|
         before = config.database
@@ -96,7 +101,7 @@ module Shadow::Config
     end
   end
 
-  def reset_database
+  def self.reset_database
     load_config do |config|
       Utils.conflict? config.database, :database do |conflict?|
         Render.delete config.database if conflict?
@@ -109,7 +114,7 @@ module Shadow::Config
     end
   end
 
-  def destroy_database
+  def self.destroy_database(&block)
     load_config do |config|
       Utils.delete config.database do
         Render.delete config.database
@@ -118,7 +123,7 @@ module Shadow::Config
     end
   end
 
-  def init_database
+  def self.init_database
     load_config do |config|
       Utils.conflict? config.database, :database do |conflict?|
         Render.delete config.database if conflict?

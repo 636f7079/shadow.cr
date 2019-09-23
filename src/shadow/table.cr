@@ -50,7 +50,7 @@ class Shadow::Table
     return yield option.table.name unless table_names.includes? option.table.name
 
     loop do
-      print Render.enter ask ensure input = Utils.input
+      print Render.enter ask ensure input = Config::Utils.input
       break yield input unless table_names.includes? input
       puts "The Input TableName Already exists, Please try again."
     end
@@ -60,7 +60,7 @@ class Shadow::Table
     return yield option.table.name if table_names.includes? option.table.name
 
     loop do
-      print Render.enter ask ensure input = Utils.input
+      print Render.enter ask ensure input = Config::Utils.input
       break yield input if table_names.includes? input
       puts "The Input TableName Does not Exist, Please try again."
     end

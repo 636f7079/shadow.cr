@@ -10,6 +10,7 @@ require "sqlite3"
 require "file_utils"
 require "openssl/hmac"
 require "../lib/shield/src/shield/*"
+require "./shadow/config/*"
 require "./shadow/*"
 
 module Shadow::CommandParser

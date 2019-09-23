@@ -1,5 +1,4 @@
 class Shadow::SQLite
-  alias Message = String | Nil
   getter location
   property database : DB::Database
 
