@@ -1,0 +1,15 @@
+name: shadow
+version: 0.2.4
+
+dependencies:
+  shield:
+    github: 636f7374/shield.cr
+  terminal_table:
+    github: benoist/terminal_table.cr
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
+
+authors:
+  - 636f7374
+
+license: MIT
