@@ -19,7 +19,7 @@ module Shadow::CommandParser
     puts <<-EOF
     Version:
       Shadow.cr :: CLI Password Vault
-      _Version_ :: #{VERSION} (2019.09.25)
+      _Version_ :: #{VERSION} (2019.10.06)
     EOF
   when "help", "-h"
     puts <<-EOF
