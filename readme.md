@@ -1,7 +1,7 @@
 <div align = "center"><img src="images/icon.png" width="256" height="256" /></div>
 
 <div align = "center">
-  <h1>Shadow.cr - Concept Shield Password Vault</h1>
+  <h1>Shadow.cr - Concept Password Vault</h1>
 </div>
 
 <p align="center">
